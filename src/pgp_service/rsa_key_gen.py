@@ -4,8 +4,40 @@ import hashlib
 
 from .entries import PrivateKeyEntry, PublicKeyEntry
 
+
+def export_private_key(private_key, password: str) -> str:
+    pem_bytes = private_key.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.PKCS8,
+        encryption_algorithm=serialization.BestAvailableEncryption(
+            password.encode("utf-8")
+        )
+    )
+    return pem_bytes.decode("utf-8")
+
+
+def export_public_key(public_key) -> str:
+    pem_bytes = public_key.public_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PublicFormat.SubjectPublicKeyInfo
+    )
+    return pem_bytes.decode("utf-8")
+
+
+def import_public_key(pem: str):
+    return serialization.load_pem_public_key(
+        pem.encode("utf-8")
+    )
+
+def import_private_key(pem: str, password: str):
+    return serialization.load_pem_private_key(
+        pem.encode("utf-8"),
+        password=password.encode("utf-8")
+    )
+
+
 def generate_rsa_key_pair(name: str, email: str, key_size: int, password: str) -> tuple[PrivateKeyEntry, PublicKeyEntry]:
-    """Generates an RSA Key pair, formats them as PEM strings, and returns Key Entries."""
+    #Generise RSA ključeve, serijalizuje ih u PEM format, i kreira DataClass objekte za privatni i javni ključ.
     
     # 1. Generisanje RSA privatnog ključa i javnog ključa
     private_key = rsa.generate_private_key(

@@ -10,6 +10,9 @@ class PublicKeyRing:
     def add(self, entry: PublicKeyEntry) -> None:
         self.entries[entry.key_id] = entry
 
+    def update(self, entry: PublicKeyEntry) -> None:
+        self.entries[entry.key_id] = entry
+
     def get(self, key_id: str) -> PublicKeyEntry:
         try:
             return self.entries[key_id]
