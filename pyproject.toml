@@ -7,6 +7,9 @@ name = "pgp-service"
 version = "0.1.0"
 description = "PGP service models and utilities"
 requires-python = ">=3.11"
+dependencies = [
+    "cryptography>=41.0.0"
+]
 
 [tool.setuptools]
 package-dir = {"" = "src"}

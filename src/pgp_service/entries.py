@@ -7,7 +7,8 @@ from datetime import datetime, timezone
 @dataclass(frozen=True, slots=True)
 class PublicKeyEntry:
     key_id: str
-    user_id: str
+    name: str
+    email: str
     public_key: str
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -15,7 +16,9 @@ class PublicKeyEntry:
 @dataclass(frozen=True, slots=True)
 class PrivateKeyEntry:
     key_id: str
-    user_id: str
+    name: str
+    email: str
     private_key: str
     public_key: str
+    password: str
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
