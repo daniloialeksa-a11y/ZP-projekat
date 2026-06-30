@@ -1,5 +1,6 @@
-from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.hazmat.primitives import serialization
+from cryptography.exceptions import InvalidKey
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import padding, rsa
 import hashlib
 
 from .entries import PrivateKeyEntry, PublicKeyEntry
@@ -30,15 +31,42 @@ def import_public_key(pem: str):
     )
 
 def import_private_key(pem: str, password: str):
-    return serialization.load_pem_private_key(
-        pem.encode("utf-8"),
-        password=password.encode("utf-8")
+    try:
+        return serialization.load_pem_private_key(
+            pem.encode("utf-8"),
+            password=password.encode("utf-8")
+        )
+    except (ValueError, TypeError, InvalidKey) as exc:
+        raise ValueError("Invalid password or corrupted key") from exc
+
+
+def unlock_private_key(entry: PrivateKeyEntry, password: str):
+    return import_private_key(entry.private_key, password)
+
+
+def validate_private_key(entry: PrivateKeyEntry, password: str) -> bool:
+    try:
+        import_private_key(entry.private_key, password)
+        return True
+    except ValueError:
+        return False
+
+
+def sign_message(private_entry: PrivateKeyEntry, password: str, message: bytes):
+    private_key = unlock_private_key(private_entry, password)
+    return private_key.sign(
+        message,
+        padding.PKCS1v15(),
+        hashes.SHA1(),
     )
 
 
 def generate_rsa_key_pair(name: str, email: str, key_size: int, password: str) -> tuple[PrivateKeyEntry, PublicKeyEntry]:
     #Generise RSA ključeve, serijalizuje ih u PEM format, i kreira DataClass objekte za privatni i javni ključ.
-    
+
+    if key_size not in (1024, 2048):
+        raise ValueError("Key size must be either 1024 or 2048 bits")
+
     # 1. Generisanje RSA privatnog ključa i javnog ključa
     private_key = rsa.generate_private_key(
         public_exponent=65537,
@@ -47,6 +75,7 @@ def generate_rsa_key_pair(name: str, email: str, key_size: int, password: str) -
     public_key = private_key.public_key()
 
     # 2. Serijalizacija privatnog ključa u PEM format, šifrovanog pomoću prosleđene lozinke
+    # Lozinka se koristi samo za zaštitu privatnog ključa; ne čuva se u entry objektu.
     private_pem_bytes = private_key.private_bytes(
         encoding=serialization.Encoding.PEM,
         format=serialization.PrivateFormat.PKCS8,
@@ -74,7 +103,6 @@ def generate_rsa_key_pair(name: str, email: str, key_size: int, password: str) -
         email=email,
         private_key=private_pem,
         public_key=public_pem,
-        password=password
     )
     
     public_entry = PublicKeyEntry(

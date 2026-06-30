@@ -20,5 +20,4 @@ class PrivateKeyEntry:
     email: str
     private_key: str
     public_key: str
-    password: str
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
