@@ -1,7 +1,13 @@
-from cryptography.exceptions import InvalidKey
-from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import padding, rsa
+import base64
 import hashlib
+import os
+import zlib
+
+from cryptography.exceptions import InvalidKey
+from cryptography.hazmat.primitives import hashes, serialization, padding as padding_lib
+from cryptography.hazmat.primitives.asymmetric import padding as asym_padding, rsa
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 from .entries import PrivateKeyEntry, PublicKeyEntry
 
@@ -59,10 +65,57 @@ def sign_message(private_entry: PrivateKeyEntry, password: str, message: bytes):
     private_key = unlock_private_key(private_entry, password)
     return private_key.sign(
         message,
-        padding.PKCS1v15(),
+        asym_padding.PKCS1v15(),
         hashes.SHA1(),
     )
 
+
+def compress(data: bytes) -> bytes:
+    return zlib.compress(data)
+
+def decompress(data: bytes) -> bytes:
+    return zlib.decompress(data)
+
+def radix64_encode(data: bytes) -> bytes:
+    return base64.b64encode(data)
+
+def radix64_decode(data: bytes) -> bytes:
+    return base64.b64decode(data)
+
+def tripleDesEncrypt(message: bytes, key: bytes) -> bytes:
+    iv = os.urandom(8) 
+
+    padder = padding_lib.PKCS7(64).padder()
+    padded_data = padder.update(message) + padder.finalize()
+
+    cipher = Cipher(algorithms.TripleDES(key), modes.CBC(iv))
+    encryptor = cipher.encryptor()
+    ciphertext = encryptor.update(padded_data) + encryptor.finalize()
+
+    return iv + ciphertext
+
+def tripleDesDecrypt(encrypted_package: bytes, key: bytes) -> bytes:
+    iv = encrypted_package[:8]
+    ciphertext = encrypted_package[8:]
+
+    cipher = Cipher(algorithms.TripleDES(key), modes.CBC(iv))
+    decryptor = cipher.decryptor()
+    padded_data = decryptor.update(ciphertext) + decryptor.finalize()
+
+    unpadder = padding_lib.PKCS7(64).unpadder()
+    return unpadder.update(padded_data) + unpadder.finalize()
+
+def aesEncrypt(message: bytes, key: bytes) -> bytes:
+    nonce = os.urandom(12)
+    aesgcm = AESGCM(key)
+    ciphertext = aesgcm.encrypt(nonce, message, associated_data=None)
+    return nonce + ciphertext
+
+def aesDecrypt(encrypted_package: bytes, key: bytes) -> bytes:
+    nonce = encrypted_package[:12]
+    ciphertext = encrypted_package[12:]
+    aesgcm = AESGCM(key)
+    return aesgcm.decrypt(nonce, ciphertext, associated_data=None)
 
 def generate_rsa_key_pair(name: str, email: str, key_size: int, password: str) -> tuple[PrivateKeyEntry, PublicKeyEntry]:
     #Generise RSA ključeve, serijalizuje ih u PEM format, i kreira DataClass objekte za privatni i javni ključ.
