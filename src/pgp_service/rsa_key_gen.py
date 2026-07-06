@@ -1,14 +1,14 @@
-import base64
-import hashlib
 import os
-import zlib
-
-from cryptography.exceptions import InvalidKey
-from cryptography.hazmat.primitives import hashes, serialization, padding as padding_lib
-from cryptography.hazmat.primitives.asymmetric import padding as asym_padding, rsa
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+import string
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-
+from cryptography.exceptions import InvalidKey
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import padding, rsa
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives import padding
+import hashlib
+import zlib
+import base64
 from .entries import PrivateKeyEntry, PublicKeyEntry
 
 def upisiNaLokaciju(pem_data: str, file_path: str) -> None:
@@ -65,7 +65,7 @@ def sign_message(private_entry: PrivateKeyEntry, password: str, message: bytes):
     private_key = unlock_private_key(private_entry, password)
     return private_key.sign(
         message,
-        asym_padding.PKCS1v15(),
+        padding.PKCS1v15(),
         hashes.SHA1(),
     )
 
@@ -85,7 +85,7 @@ def radix64_decode(data: bytes) -> bytes:
 def tripleDesEncrypt(message: bytes, key: bytes) -> bytes:
     iv = os.urandom(8) 
 
-    padder = padding_lib.PKCS7(64).padder()
+    padder = padding.PKCS7(64).padder()
     padded_data = padder.update(message) + padder.finalize()
 
     cipher = Cipher(algorithms.TripleDES(key), modes.CBC(iv))
@@ -102,7 +102,7 @@ def tripleDesDecrypt(encrypted_package: bytes, key: bytes) -> bytes:
     decryptor = cipher.decryptor()
     padded_data = decryptor.update(ciphertext) + decryptor.finalize()
 
-    unpadder = padding_lib.PKCS7(64).unpadder()
+    unpadder = padding.PKCS7(64).unpadder()
     return unpadder.update(padded_data) + unpadder.finalize()
 
 def aesEncrypt(message: bytes, key: bytes) -> bytes:
@@ -171,3 +171,8 @@ def generate_rsa_key_pair(name: str, email: str, key_size: int, password: str) -
     )
 
     return private_entry, public_entry
+
+a = ""
+b = "" 
+[a,b] = generate_rsa_key_pair("Danilo", "danilo@example.com", 2048, "password")
+print ([a,b])
