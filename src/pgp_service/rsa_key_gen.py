@@ -5,6 +5,9 @@ import hashlib
 
 from .entries import PrivateKeyEntry, PublicKeyEntry
 
+def upisiNaLokaciju(pem_data: str, file_path: str) -> None:
+    with open(file_path, "w", encoding="utf-8") as f:
+        f.write(pem_data)
 
 def export_private_key(private_key, password: str) -> str:
     pem_bytes = private_key.private_bytes(
@@ -65,7 +68,7 @@ def generate_rsa_key_pair(name: str, email: str, key_size: int, password: str) -
     #Generise RSA ključeve, serijalizuje ih u PEM format, i kreira DataClass objekte za privatni i javni ključ.
 
     if key_size not in (1024, 2048):
-        raise ValueError("Key size must be either 1024 or 2048 bits")
+        raise ValueError("Velicina kljuca mora da bude ili 1024 ili 2048")
 
     # 1. Generisanje RSA privatnog ključa i javnog ključa
     private_key = rsa.generate_private_key(
@@ -103,13 +106,15 @@ def generate_rsa_key_pair(name: str, email: str, key_size: int, password: str) -
         email=email,
         private_key=private_pem,
         public_key=public_pem,
+        key_length=key_size,
     )
     
     public_entry = PublicKeyEntry(
         key_id=key_id,
         name=name,
         email=email,
-        public_key=public_pem
+        public_key=public_pem,
+        key_length=key_size
     )
 
     return private_entry, public_entry

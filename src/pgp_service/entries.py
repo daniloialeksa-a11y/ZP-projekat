@@ -10,6 +10,7 @@ class PublicKeyEntry:
     name: str
     email: str
     public_key: str
+    key_length: int
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
 
@@ -20,4 +21,5 @@ class PrivateKeyEntry:
     email: str
     private_key: str
     public_key: str
+    key_length: int
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))

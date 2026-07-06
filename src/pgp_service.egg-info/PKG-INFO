@@ -1,0 +1,6 @@
+Metadata-Version: 2.4
+Name: pgp-service
+Version: 0.1.0
+Summary: PGP service models and utilities
+Requires-Python: >=3.11
+Requires-Dist: cryptography>=41.0.0
