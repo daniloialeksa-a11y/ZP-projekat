@@ -6,6 +6,7 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding
+from cryptography.exceptions import InvalidSignature
 import hashlib
 import zlib
 import base64
@@ -68,6 +69,20 @@ def sign_message(private_entry: PrivateKeyEntry, password: str, message: bytes):
         padding.PKCS1v15(),
         hashes.SHA1(),
     )
+
+
+def verify_signature(public_entry: PublicKeyEntry, message: bytes, signature: bytes) -> bool:
+    public_key = import_public_key(public_entry.public_key)
+    try:
+        public_key.verify(
+            signature,
+            message,
+            padding.PKCS1v15(),
+            hashes.SHA1(),
+        )
+        return True
+    except InvalidSignature:
+        return False
 
 
 def compress(data: bytes) -> bytes:
