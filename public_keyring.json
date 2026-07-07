@@ -1,0 +1,10 @@
+{
+  "359CDCDC55B0B847": {
+    "key_id": "359CDCDC55B0B847",
+    "name": "Danilo",
+    "email": "danilo@example.com",
+    "public_key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0RIrUKW85OtvGdNQj1fp\naXyGyT47zejPG66zFx1VnJd1E5Qvu6t4Zuk0Ja47GdZfmM7ONHJOhyK0DrCnkWyI\navWlg5L9ebijFoThys69fdAsVucWIKeKanioFrVzGOPNjlva5Y0JlFHURrByBJ7+\nOjm8lQuJd2yj5DnhjuaPN0ruMjAinkYarttJPVZJqNH0CKaukP99SMIh9/YqwLKO\nhfDnqiUX8RadNPxzyOkUo18ggjj3ai0JTw2MBEvBV7xLjv9SWIDWVfr9rZP5HgqK\nt+Q7APHZRK42RnMQFMFlqd/EPZew58TxvBy1MtjEbeU2uiG8SrxB5bhWAfiR84F0\nZwIDAQAB\n-----END PUBLIC KEY-----\n",
+    "key_length": 2048,
+    "created_at": "2026-07-07T08:15:26.141545+00:00"
+  }
+}

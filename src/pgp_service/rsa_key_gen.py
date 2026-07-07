@@ -9,7 +9,7 @@ from cryptography.hazmat.primitives import padding
 import hashlib
 import zlib
 import base64
-from .entries import PrivateKeyEntry, PublicKeyEntry
+from entries import PrivateKeyEntry, PublicKeyEntry
 
 def upisiNaLokaciju(pem_data: str, file_path: str) -> None:
     with open(file_path, "w", encoding="utf-8") as f:
