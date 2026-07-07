@@ -35,6 +35,9 @@ class KeyManager:
         self.public_ring.add(public_entry)
         return private_entry.key_id
 
+    def is_own_key_pair(self, key_id: str) -> bool:
+        return key_id in self.private_ring              # vratice true ako postoji privatni kljuc sa istim id-om ( da li je uvezen ili ne )
+
     def delete_pair(self, key_id: str) -> bool:
         """
         Brise privatni i javni kljuc sa istim key_id iz oba ringa.

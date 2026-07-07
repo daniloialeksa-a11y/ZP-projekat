@@ -16,6 +16,8 @@ def upisiNaLokaciju(pem_data: str, file_path: str) -> None:
     with open(file_path, "w", encoding="utf-8") as f:
         f.write(pem_data)
 
+# ---------- Import i export funkcije ----------
+
 def export_private_key(private_key, password: str) -> str:
     pem_bytes = private_key.private_bytes(
         encoding=serialization.Encoding.PEM,
@@ -49,6 +51,12 @@ def import_private_key(pem: str, password: str):
     except (ValueError, TypeError, InvalidKey) as exc:
         raise ValueError("Invalid password or corrupted key") from exc
 
+# ---------- Kraj import i export funkcija ----------
+
+#------------------------------------------------------------------------------------
+
+# ---------- Funkcije za rad sa privatnim ključevima ----------
+
 
 def unlock_private_key(entry: PrivateKeyEntry, password: str):
     return import_private_key(entry.private_key, password)
@@ -61,6 +69,12 @@ def validate_private_key(entry: PrivateKeyEntry, password: str) -> bool:
     except ValueError:
         return False
 
+
+# ---------- Kraj funkcija za rad sa privatnim ključevima ----------
+
+#------------------------------------------------------------------------------------
+
+# ---------- Sekcija za potpisivanje poruka ----------
 
 def sign_message(private_entry: PrivateKeyEntry, password: str, message: bytes):
     private_key = unlock_private_key(private_entry, password)
@@ -83,7 +97,8 @@ def verify_signature(public_entry: PublicKeyEntry, message: bytes, signature: by
         return True
     except InvalidSignature:
         return False
-
+    
+# ---------- Kraj sekcije za potpisivanje poruka ----------
 
 def compress(data: bytes) -> bytes:
     return zlib.compress(data)
