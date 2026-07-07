@@ -172,7 +172,7 @@ def generate_rsa_key_pair(name: str, email: str, key_size: int, password: str) -
 
     return private_entry, public_entry
 
-a = ""
-b = "" 
-[a,b] = generate_rsa_key_pair("Danilo", "danilo@example.com", 2048, "password")
-print ([a,b])
+# a = ""
+# b = "" 
+# [a,b] = generate_rsa_key_pair("Danilo", "danilo@example.com", 2048, "password")
+# print ([a,b])

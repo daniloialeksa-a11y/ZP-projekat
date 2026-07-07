@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from pathlib import Path
-
+PRIVATE_PATH = "private_keyring.json"
+PUBLIC_PATH = "public_keyring.json"
 from private_key_ring import PrivateKeyRing
 from public_key_ring import PublicKeyRing
 from rsa_key_gen import generate_rsa_key_pair  # funkcija iz tvog crypto modula
@@ -63,22 +64,27 @@ class KeyManager:
 
 
 if __name__ == "__main__":
-    # Mali primer koriscenja / brz sanity-check
-    manager = KeyManager()
-    key_id = manager.generate_and_add_pair("Danilo", "danilo@example.com", 2048, "password")
-    print(f"Generisan par kljuceva sa key_id: {key_id}")
-    print(f"Broj privatnih kljuceva: {len(manager.private_ring)}")
-    print(f"Broj javnih kljuceva: {len(manager.public_ring)}")
+    # 1. Učitaj postojeće stanje sa diska (ako fajlovi ne postoje, load() vraća prazan ring)
+    manager = KeyManager.load_all(PRIVATE_PATH, PUBLIC_PATH)
 
-    manager.save_all("private_keyring.json", "public_keyring.json")
+    # 2. Dodaj novi ključ NA POSTOJEĆI ring u memoriji
+    key_id = manager.generate_and_add_pair("Leon", "leon.vi@example.com", 2048, "grofica")
+
+    # 3. Sačuvaj — sada fajl sadrži i stare i novi ključ
+    manager.save_all(PRIVATE_PATH, PUBLIC_PATH)
     print("Ringovi sacuvani na disk.")
 
-    loaded = KeyManager.load_all("private_keyring.json", "public_keyring.json")
+    loaded = KeyManager.load_all(PRIVATE_PATH, PUBLIC_PATH)
     assert key_id in loaded.private_ring
     assert key_id in loaded.public_ring
     print("Ucitavanje sa diska uspesno, ringovi su konzistentni.")
 
+    # 4. Obrisi par i ODMAH sacuvaj promenu, inace ostaje samo u memoriji
     manager.delete_pair(key_id)
+    manager.save_all(PRIVATE_PATH, PUBLIC_PATH)
     assert key_id not in manager.private_ring
     assert key_id not in manager.public_ring
-    print("Par kljuceva uspesno obrisan iz oba ringa.")
+    print("Par kljuceva uspesno obrisan iz oba ringa (i sa diska).")
+
+    print(f"Broj privatnih kljuceva: {len(manager.private_ring)}")
+    print(f"Broj javnih kljuceva: {len(manager.public_ring)}")
